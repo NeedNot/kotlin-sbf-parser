@@ -4,8 +4,6 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.experimental.and
 
-private val BLOCK_SYNC = byteArrayOf(36, 64)
-
 class SBFParser {
     private var buffer: MutableList<Byte> = mutableListOf()
     val length: Int
@@ -16,26 +14,36 @@ class SBFParser {
         buffer.addAll(data.toList())
         if (buffer.isEmpty()) return
 
-        val byteArray = buffer.toByteArray()
         var position: Int
         while (true) {
-            position = byteArray.findFirst(BLOCK_SYNC)
+            val byteArray = buffer.toByteArray()
+            position = byteArray.indexOf(BLOCK_SYNC)
             if (position < 0) break
             val byteBuffer = ByteBuffer.wrap(byteArray)
             byteBuffer.position(position)
-            val header = try {
-                parseHeader(byteBuffer)
+            try {
+                val header = parseHeader(byteBuffer)
+//                todo crc calculation
+                val timestamp = parseTimestamp(byteBuffer)
+                val body = parseBody(byteBuffer, header.id.number)
+
+                // Successfully parsed block
+                blocks += SBFBlock(
+                    header = header,
+                    timestamp = timestamp,
+                    body = body
+                )
+
+                // Remove the processed bytes from the buffer
+                val processedBytes = byteBuffer.position()
+                buffer = buffer.drop(processedBytes).toMutableList()
+
             } catch (e: IncompleteBlockException) {
-                e.printStackTrace()
-                continue
+                println("Incomplete block detected. Retaining unprocessed bytes.")
+                // Retain the start of the invalid block onward
+                buffer = buffer.drop(position).toMutableList()
+                break
             }
-            val timestamp = parseTimestamp(byteBuffer)
-            val body = parseBody(byteBuffer, header.id.number)
-            blocks += SBFBlock(
-                header = header,
-                timestamp = timestamp,
-                body = body
-            )
         }
     }
 
@@ -48,12 +56,9 @@ fun parseHeader(data: ByteBuffer): BlockHeader {
     if (data.remaining() < 8) throw IncompleteBlockException("Header requires 8 bytes", data.array())
 
     val sync = String(charArrayOf(data.get().toInt().toChar(),data.get().toInt().toChar()))
-    println("${data.position()}  ${data.remaining()}")
     val crc = data.getShort().toUShort()
 
     val id = data.getShort()
-
-    println("${data.position()}  ${data.remaining()}")
 
     val length = data.getShort().toUShort()
     if (length.mod(4u)>0u) throw BlockException("Length must be a multiple of 4", data.array())
@@ -78,17 +83,19 @@ private fun isStartOrBlock() {
 //    if (crcCom != crc) throw BlockException("CRCs did not match", data.array())
 }
 
-private fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
+fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
+    if (data.remaining() < 6) throw IncompleteBlockException("Timestamp requires 6 bytes", data.array())
+
     val tow = data.getInt().toUInt()
     val wnc = data.getShort().toUShort()
 
     return BlockTimestamp(
-        tow = if (tow == TOW_DO_NOT_USE_VALUE) null else tow,
-        wnc = if (wnc == WNC_DO_NOT_USE_VALUE) null else wnc
+        tow = tow,
+        wnc = wnc
     )
 }
 
-private fun parseBody(data: ByteBuffer, id: UShort): BlockBody {
+fun parseBody(data: ByteBuffer, id: UShort): BlockBody {
 //    todo find the block id
     return decode(data, QualityInd::class.java)
 }

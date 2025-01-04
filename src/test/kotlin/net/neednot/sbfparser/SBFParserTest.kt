@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 //invalid data
 class SBFParserTest {
 
-    val data = "24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00 24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00"
+    val data = "24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00 24 76 2e 24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00"
         .replace(" ", "")
         .hexToByteArray()
     val sbfParser = SBFParser()
@@ -20,12 +20,10 @@ class SBFParserTest {
     }
 
     @Test
-    fun addData() {
+    fun addDataAndGetBlocks() {
         sbfParser.addData(data)
-    }
-
-    @Test
-    fun getBlocks() {
-
+        sbfParser.getBlocks().forEach {
+            println(it)
+        }
     }
 }

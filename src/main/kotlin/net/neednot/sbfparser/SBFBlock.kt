@@ -22,6 +22,6 @@ data class BlockId(
 )
 
 data class BlockTimestamp(
-    val tow: UInt?,
-    val wnc: UShort?
+    val tow: UInt,
+    val wnc: UShort
 )

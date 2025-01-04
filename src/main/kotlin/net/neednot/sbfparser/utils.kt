@@ -1,21 +1,17 @@
 package net.neednot.sbfparser
 
 
-/** [Source](https://stackoverflow.com/a/63848290) */
-fun ByteArray.findFirst(sequence: ByteArray,startFrom: Int = 0): Int {
-    if(sequence.isEmpty()) throw IllegalArgumentException("non-empty byte sequence is required")
-    if(startFrom < 0 ) throw IllegalArgumentException("startFrom must be non-negative")
-    var matchOffset = 0
-    var start = startFrom
-    var offset = startFrom
-    while( offset < size ) {
-        if( this[offset] == sequence[matchOffset]) {
-            if( matchOffset++ == 0 ) start = offset
-            if( matchOffset == sequence.size ) return start
+/** [Source](https://stackoverflow.com/a/21341168) */
+fun ByteArray.indexOf(smallerArray: ByteArray): Int {
+    for (i in 0 until size - smallerArray.size + 1) {
+        var found = true
+        for (j in smallerArray.indices) {
+            if (this[i + j] != smallerArray[j]) {
+                found = false
+                break
+            }
         }
-        else
-            matchOffset = 0
-        offset++
+        if (found) return i
     }
     return -1
 }

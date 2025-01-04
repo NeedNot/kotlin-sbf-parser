@@ -12,6 +12,15 @@ data class QualityInd(
     val n: UByte,
     val reserved: UByte,
 
-    @StringLength("n")
+    /**
+     * Bits need to be interpreted as follows:
+     *
+     * 0-7: Quality indicator type
+     *
+     * 8-11: Quality indicator value
+     *
+     * 12-15: Reserved
+     * */
+    @ArrayLength("n")
     val indicators: UShortArray
 ): BlockBody

@@ -3,11 +3,12 @@ package net.neednot.sbfparser
 import java.nio.ByteBuffer
 import kotlin.reflect.KParameter
 
+@OptIn(ExperimentalUnsignedTypes::class)
 fun <T : BlockBody> decode(bytes: ByteBuffer, clazz: Class<T>): T {
     val constructor = clazz.kotlin.constructors.first()
     val params = mutableMapOf<KParameter, Any?>()
 
-    constructor.parameters.forEach { param ->
+    constructor.parameters.filter { it.name != "name" }.forEach { param ->
         val type = param.type
         val value = when (type.classifier) {
             UByte::class -> bytes.get().toUByte()
@@ -21,28 +22,19 @@ fun <T : BlockBody> decode(bytes: ByteBuffer, clazz: Class<T>): T {
             Float::class -> bytes.getFloat()
             Double::class -> bytes.getDouble()
             String::class -> {
-                val annotation = clazz.kotlin.members
-                    .find { it.name == param.name }
-                    ?.annotations
-                    ?.filterIsInstance<StringLength>()
-                    ?.firstOrNull()
-
-                if (annotation != null) {
-                    val lengthFieldName = annotation.lengthFieldName
-                    val length = if (lengthFieldName == "") {
-                        params.entries.first { it.key.name == lengthFieldName }.value as Int
-                    } else {
-                        if (annotation.length == -1) {
-                            throw IllegalArgumentException("@StringLength annotation requires a lengthFieldName or length parameter")
-                        }
-                        annotation.length
-                    }
-                    val stringBytes = ByteArray(length)
-                    bytes.get(stringBytes, 0, length)
-                    stringBytes.toString(Charsets.US_ASCII)
-                } else {
-                    throw IllegalArgumentException("String property ${param.name} requires @StringLength annotation")
-                }
+                val length = getArrayLength(clazz, param, params)
+                val stringBytes = ByteArray(length)
+                bytes.get(stringBytes, 0, length)
+                stringBytes.toString(Charsets.US_ASCII)
+            }
+            UShortArray::class -> {
+//                number of uShorts (2 bytes each)
+                val length = getArrayLength(clazz, param, params)
+                val byteArray = ByteArray(length*2)
+                bytes.get(byteArray, 0, length*2)
+                ShortArray(byteArray.size / 2) {
+                    (byteArray[it * 2].toUByte().toInt() + (byteArray[(it * 2) + 1].toInt() shl 8)).toShort()
+                }.toUShortArray()
             }
             else -> throw IllegalArgumentException("Unsupported type: $type")
         }
@@ -50,6 +42,42 @@ fun <T : BlockBody> decode(bytes: ByteBuffer, clazz: Class<T>): T {
     }
 
     return constructor.callBy(params)
+}
+
+private fun getArrayLength(clazz: Class<*>, param: KParameter, params: Map<KParameter, Any?>): Int {
+    val annotation = clazz.kotlin.members
+        .find { it.name == param.name }
+        ?.annotations
+        ?.filterIsInstance<ArrayLength>()
+        ?.firstOrNull()
+
+    if (annotation == null) {
+        throw IllegalArgumentException("String or Array property ${param.name} requires @ArrayLength annotation")
+    }
+
+    val lengthFieldName = annotation.lengthFieldName
+    return if (lengthFieldName != "") {
+        val mapEntry = (params.entries.first { it.key.name == lengthFieldName })
+        val value = mapEntry.value
+        when (value) {
+            is Byte -> value.toInt()
+            is UByte -> value.toInt()
+            is Short -> value.toInt()
+            is UShort -> value.toInt()
+            is Int -> value
+            is UInt -> value.toInt()
+            is Long -> value.toInt()
+            is ULong -> value.toInt()
+            is Float -> value.toInt()
+            is Double -> value.toInt()
+            else -> throw IllegalArgumentException("${param.name} is not a valid number type: $value")
+        }
+    } else {
+        if (annotation.length == -1) {
+            throw IllegalArgumentException("@ArrayLength annotation requires a lengthFieldName or length parameter")
+        }
+        annotation.length
+    }
 }
 
 
@@ -67,4 +95,4 @@ fun <T : BlockBody> decode(bytes: ByteBuffer, clazz: Class<T>): T {
  * */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class StringLength(val lengthFieldName: String = "", val length: Int = -1)
+annotation class ArrayLength(val lengthFieldName: String = "", val length: Int = -1)
