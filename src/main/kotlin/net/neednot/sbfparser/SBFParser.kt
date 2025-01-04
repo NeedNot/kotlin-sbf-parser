@@ -1,8 +1,6 @@
 package net.neednot.sbfparser
 
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import kotlin.experimental.and
 
 class SBFParser {
     private var buffer: MutableList<Byte> = mutableListOf()
@@ -40,8 +38,6 @@ class SBFParser {
 
             } catch (e: IncompleteBlockException) {
                 println("Incomplete block detected. Retaining unprocessed bytes.")
-                // Retain the start of the invalid block onward
-                buffer = buffer.drop(position).toMutableList()
                 break
             }
         }
@@ -61,7 +57,7 @@ fun parseHeader(data: ByteBuffer): BlockHeader {
     val id = data.getShort()
 
     val length = data.getShort().toUShort()
-    if (length.mod(4u)>0u) throw BlockException("Length must be a multiple of 4", data.array())
+    if (length.mod(4u)>0u) throw InvalidBlockException("Length must be a multiple of 4", data.array())
 
 //    create SBFBlockId from id
     val number = id.toInt() and 0x1FFF

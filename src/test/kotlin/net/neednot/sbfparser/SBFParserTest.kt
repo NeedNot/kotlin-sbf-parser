@@ -1,18 +1,10 @@
-package net.neednot.sbfparser;
+package net.neednot.sbfparser
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test
 
-//test for complete data
-//half data
-//complete + half data
-//two complete data
 //invalid data
+@OptIn(ExperimentalStdlibApi::class)
 class SBFParserTest {
-
-    val data = "24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00 24 76 2e 24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00"
-        .replace(" ", "")
-        .hexToByteArray()
-    val sbfParser = SBFParser()
 
     @Test
     fun getLength() {
@@ -20,10 +12,33 @@ class SBFParserTest {
     }
 
     @Test
-    fun addDataAndGetBlocks() {
+    fun fullAndIncomplete() {
+        val sbfParser = SBFParser()
+        val data = "24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00 24 76 2e 24 40 34 b1 f2 0f 18 00 ff ff"
+            .replace(" ", "").hexToByteArray()
         sbfParser.addData(data)
-        sbfParser.getBlocks().forEach {
-            println(it)
+        require(sbfParser.getBlocks().size == 1)
+    }
+
+    @Test
+    fun incomplete() {
+        val sbfParser = SBFParser()
+        val data = "24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15"
+            .replace(" ", "").hexToByteArray()
+        sbfParser.addData(data)
+        require(sbfParser.getBlocks().isEmpty())
+    }
+
+    @Test
+    fun invalid() {
+        try {
+            val sbfParser = SBFParser()
+            val data = "24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00"
+                .replace(" ", "").hexToByteArray()
+            sbfParser.addData(data)
+            throw Exception("Invalid block not detected")
+        } catch (e: InvalidBlockException) {
+
         }
     }
 }

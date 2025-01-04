@@ -30,6 +30,9 @@ fun <T : BlockBody> decode(bytes: ByteBuffer, clazz: Class<T>): T {
             UShortArray::class -> {
 //                number of uShorts (2 bytes each)
                 val length = getArrayLength(clazz, param, params)
+                if (bytes.remaining() < length*2) {
+                    throw IncompleteBlockException("Not enough bytes to decode UShortArray", bytes.array())
+                }
                 val byteArray = ByteArray(length*2)
                 bytes.get(byteArray, 0, length*2)
                 ShortArray(byteArray.size / 2) {
