@@ -1,6 +1,7 @@
 package net.neednot.sbfparser
 
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class SBFParser {
     private var buffer: MutableList<Byte> = mutableListOf()
@@ -17,7 +18,7 @@ class SBFParser {
             val byteArray = buffer.toByteArray()
             position = byteArray.indexOf(BLOCK_SYNC)
             if (position < 0) break
-            val byteBuffer = ByteBuffer.wrap(byteArray)
+            val byteBuffer = ByteBuffer.wrap(byteArray).order(ByteOrder.LITTLE_ENDIAN)
             byteBuffer.position(position)
             try {
                 val header = parseHeader(byteBuffer)

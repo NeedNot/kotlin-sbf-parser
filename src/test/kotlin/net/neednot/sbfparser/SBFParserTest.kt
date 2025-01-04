@@ -17,7 +17,9 @@ class SBFParserTest {
         val data = "24 40 34 b1 f2 0f 18 00 ff ff ff ff ff ff 04 00 0b 00 01 00 15 0a 00 00 24 76 2e 24 40 34 b1 f2 0f 18 00 ff ff"
             .replace(" ", "").hexToByteArray()
         sbfParser.addData(data)
-        require(sbfParser.getBlocks().size == 1)
+        val blocks = sbfParser.getBlocks()
+        println(blocks)
+        require(blocks.size == 1)
     }
 
     @Test
