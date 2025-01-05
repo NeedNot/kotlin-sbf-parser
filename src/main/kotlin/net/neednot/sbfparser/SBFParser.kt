@@ -22,7 +22,19 @@ class SBFParser {
             byteBuffer.position(position)
             try {
                 val header = parseHeader(byteBuffer)
-//                todo crc calculation
+                val originalPosition = byteBuffer.position()
+                val crcBufferLength = 4+(header.length.toInt()-8)
+                val crcArray = ByteArray(crcBufferLength)
+                byteBuffer.position(originalPosition-4)
+                if (crcBufferLength > byteBuffer.remaining()) {
+                    throw IncompleteBlockException("Not enough bytes to make a block", byteBuffer.array())
+                }
+                byteBuffer.get(crcArray)
+                if (!validateCRC(crcArray, header.crc)) {
+                    throw InvalidBlockException("CRCs did not match", byteBuffer.array())
+                }
+//                reset to after header
+                byteBuffer.position(originalPosition)
                 val timestamp = parseTimestamp(byteBuffer)
                 val body = parseBody(byteBuffer, header.id.number)
 
@@ -38,7 +50,6 @@ class SBFParser {
                 buffer = buffer.drop(processedBytes).toMutableList()
 
             } catch (e: IncompleteBlockException) {
-                println("Incomplete block detected. Retaining unprocessed bytes.")
                 break
             }
         }
@@ -86,4 +97,8 @@ fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
 
 fun parseBody(data: ByteBuffer, id: UShort): BlockBody {
     return decode(data, blockClassById[id.toInt()] as Class<BlockBody>)
+}
+
+fun validateCRC(data: ByteArray, target: UShort): Boolean {
+    return computeCrc(data).toUShort() == target
 }
