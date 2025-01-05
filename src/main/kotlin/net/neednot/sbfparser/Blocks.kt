@@ -7,7 +7,7 @@ sealed interface BlockBody {
 /** Block id 4082 */
 @OptIn(ExperimentalUnsignedTypes::class)
 data class QualityInd(
-    override val name: String = "qualityInd",
+    override val name: String = "QualityInd",
 
     val n: UByte,
     val reserved: UByte,
@@ -23,4 +23,17 @@ data class QualityInd(
      * */
     @ArrayLength("n")
     val indicators: UShortArray
+): BlockBody
+
+/** Block id 4094 */
+data class PosProjected(
+    override val name: String = "PosProjected",
+
+    val mode: UByte,
+    val error: UByte,
+    val northing: Double,
+    val easting: Double,
+    val alt: Double,
+    val datum: UByte
+
 ): BlockBody

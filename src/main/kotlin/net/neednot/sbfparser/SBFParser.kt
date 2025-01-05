@@ -72,14 +72,6 @@ fun parseHeader(data: ByteBuffer): BlockHeader {
     )
 }
 
-private fun isStartOrBlock() {
-    TODO()
-//        val bytesForCRC = ByteArray(length.toInt()-8)
-//    data.get(bytesForCRC)
-//    val crcCom = computeCRC(bytesForCRC)
-//    if (crcCom != crc) throw BlockException("CRCs did not match", data.array())
-}
-
 fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
     if (data.remaining() < 6) throw IncompleteBlockException("Timestamp requires 6 bytes", data.array())
 
@@ -94,5 +86,5 @@ fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
 
 fun parseBody(data: ByteBuffer, id: UShort): BlockBody {
 //    todo find the block id
-    return decode(data, QualityInd::class.java)
+    return decode(data, PosProjected::class.java)
 }

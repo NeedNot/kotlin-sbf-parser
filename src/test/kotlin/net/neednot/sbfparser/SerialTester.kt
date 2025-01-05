@@ -52,6 +52,7 @@ fun readSerialData(portName: String) {
                     blocks.forEach { block ->
                         println("took ${System.currentTimeMillis() - lastSuccess} ms")
                         lastSuccess = System.currentTimeMillis()
+                        println(block)
                     }
                 } else {
                     println("blocks empty")
