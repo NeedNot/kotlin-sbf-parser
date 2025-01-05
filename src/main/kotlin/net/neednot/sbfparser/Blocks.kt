@@ -37,3 +37,28 @@ data class PosProjected(
     val datum: UByte
 
 ): BlockBody
+
+/** Block id 4028 */
+data class BaseVectorGeod(
+    override val name: String = "BaseVectorGeod",
+
+    val n: UByte,
+    val sbLength: UByte,
+
+//    sub block
+    val nrSV: UByte,
+    val error: UByte,
+    val mode: UByte,
+    val misc: UByte,
+    val deltaEast: Double,
+    val deltaNorth: Double,
+    val deltaUp: Double,
+    val deltaVe: Float,
+    val deltaVn: Float,
+    val deltaVu: Float,
+    val azimuth: UShort,
+    val elevation: Short,
+    val referenceId: UShort,
+    val corrAge: UShort,
+    val signalInfo: UInt
+): BlockBody

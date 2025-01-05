@@ -85,6 +85,5 @@ fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
 }
 
 fun parseBody(data: ByteBuffer, id: UShort): BlockBody {
-//    todo find the block id
-    return decode(data, PosProjected::class.java)
+    return decode(data, blockClassById[id.toInt()] as Class<BlockBody>)
 }
