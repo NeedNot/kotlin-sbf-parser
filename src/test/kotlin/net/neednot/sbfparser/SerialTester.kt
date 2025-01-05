@@ -52,7 +52,16 @@ fun readSerialData(portName: String) {
                     blocks.forEach { block ->
                         println("took ${System.currentTimeMillis() - lastSuccess} ms")
                         lastSuccess = System.currentTimeMillis()
-                        println(block)
+                        val body = block.body
+                        when (body) {
+                            is BaseVectorGeod -> {
+                                println("East ${body.deltaEast}, North ${body.deltaNorth}, Up ${body.deltaUp}")
+                            }
+                            is QualityInd -> {
+                                println("Quality $body")
+                            }
+                            else -> println("Unknown block")
+                        }
                     }
                 } else {
                     println("blocks empty")
