@@ -51,12 +51,20 @@ class SBFParser {
 
             } catch (e: IncompleteBlockException) {
                 break
+            } catch (e: InvalidBlockException) {
+//                Remove the invalid bytes from the buffer
+                val processedBytes = byteBuffer.position()
+                buffer = buffer.drop(processedBytes).toMutableList()
             }
         }
     }
 
     fun getBlocks(): List<SBFBlock> {
         return blocks.toList().also { blocks.clear() }
+    }
+
+    fun clearData() {
+        buffer.clear()
     }
 }
 
