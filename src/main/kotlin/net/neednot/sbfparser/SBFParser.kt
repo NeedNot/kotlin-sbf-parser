@@ -104,7 +104,8 @@ private fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
 }
 
 private fun parseBody(data: ByteBuffer, id: UShort): BlockBody {
-    return decode(data, blockClassById[id.toInt()] as Class<BlockBody>)
+    val clazz = blockClassById[id.toInt()] ?: throw InvalidBlockException("Unknown block type $id", data.array())
+    return decode(data, clazz as Class<BlockBody>)
 }
 
 private fun validateCRC(data: ByteArray, target: UShort): Boolean {
