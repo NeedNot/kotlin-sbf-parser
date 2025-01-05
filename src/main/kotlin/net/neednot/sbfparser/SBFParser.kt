@@ -68,7 +68,7 @@ class SBFParser {
     }
 }
 
-fun parseHeader(data: ByteBuffer): BlockHeader {
+private fun parseHeader(data: ByteBuffer): BlockHeader {
     if (data.remaining() < 8) throw IncompleteBlockException("Header requires 8 bytes", data.array())
 
     val sync = String(charArrayOf(data.get().toInt().toChar(),data.get().toInt().toChar()))
@@ -91,7 +91,7 @@ fun parseHeader(data: ByteBuffer): BlockHeader {
     )
 }
 
-fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
+private fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
     if (data.remaining() < 6) throw IncompleteBlockException("Timestamp requires 6 bytes", data.array())
 
     val tow = data.getInt().toUInt()
@@ -103,10 +103,10 @@ fun parseTimestamp(data: ByteBuffer): BlockTimestamp {
     )
 }
 
-fun parseBody(data: ByteBuffer, id: UShort): BlockBody {
+private fun parseBody(data: ByteBuffer, id: UShort): BlockBody {
     return decode(data, blockClassById[id.toInt()] as Class<BlockBody>)
 }
 
-fun validateCRC(data: ByteArray, target: UShort): Boolean {
+private fun validateCRC(data: ByteArray, target: UShort): Boolean {
     return computeCrc(data).toUShort() == target
 }

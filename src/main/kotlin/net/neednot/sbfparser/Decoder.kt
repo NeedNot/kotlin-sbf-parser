@@ -3,6 +3,7 @@ package net.neednot.sbfparser
 import java.nio.ByteBuffer
 import kotlin.reflect.KParameter
 
+@Suppress("IMPLICIT_CAST_TO_ANY")
 @OptIn(ExperimentalUnsignedTypes::class)
 fun <T : BlockBody> decode(bytes: ByteBuffer, clazz: Class<T>): T {
     val constructor = clazz.kotlin.constructors.first()
@@ -83,15 +84,14 @@ private fun getArrayLength(clazz: Class<*>, param: KParameter, params: Map<KPara
     }
 }
 
-
-
 /**
- * Put this annotation over a String property to specify the length
+ * Put this annotation over a String or array property to specify the length
  *
  * @param lengthFieldName name of a decoded property to use as the length
  * @param length hardcoded int value to use as the length
  *
  * Example
+ *
  * Block 4082 has property N and later Indicators
  * N is an unsigned 8-bit integer while Indicators is an Ascii string of N length.
  * So you would annotate indicators with the lengthFieldName = "n"
