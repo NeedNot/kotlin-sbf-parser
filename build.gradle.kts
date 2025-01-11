@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.10" // Use the appropriate Kotlin version
+    kotlin("jvm") version "1.9.10"
+    id("maven-publish")
 }
 
 repositories {
@@ -18,14 +19,28 @@ java {
     withJavadocJar() // Include Javadoc in the JAR
 }
 
+val projectVersion = "1.0.0"
+
 tasks.jar {
     manifest {
         attributes["Implementation-Title"] = "kotlin-sbf-parser"
-        attributes["Implementation-Version"] = "1.0.0"
+        attributes["Implementation-Version"] = projectVersion
         attributes["Built-By"] = "Need_Not"
     }
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "net.neednot"
+            artifactId = "sbfparser"
+            version = projectVersion
+
+            from(components["java"])
+        }
+    }
 }
