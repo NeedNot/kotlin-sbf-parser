@@ -19,7 +19,7 @@ java {
     withJavadocJar() // Include Javadoc in the JAR
 }
 
-val projectVersion = "1.0.0"
+val projectVersion = "1.0.1"
 
 tasks.jar {
     manifest {
