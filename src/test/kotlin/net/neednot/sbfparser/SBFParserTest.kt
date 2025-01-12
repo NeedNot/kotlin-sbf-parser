@@ -1,6 +1,7 @@
 package net.neednot.sbfparser
 
 import org.junit.jupiter.api.Test
+import kotlin.math.abs
 
 //invalid data
 @OptIn(ExperimentalStdlibApi::class)
@@ -49,7 +50,11 @@ class SBFParserTest {
     @Test
     fun badBaseVectorGeod() {
         val sbfParser = SBFParser()
-        val data = byteArrayOf(36, 64, -79, 55, -68, 15, 16, 0, -1, -1, -1, -1, -1, -1, 0, 52)
+        val data = byteArrayOf(36, 64, 43, 91, -68, 15, 68, 0, 14, -8, -107, 4, 45, 9, 1, 52, 18, 0, 5, 16, 35, 14, 89, 91, -80, -5, 53, -64, 101, 117, -25, 6, -62, 126, 37, 64, 57, -66, -42, 58, -116, -47, -27, -65, 102, -62, 34, -69, 124, -99, -18, -70, -64, -17, 33, 59, -91, 115, 97, -1, 0, 0, 123, 0, 13, 9, 34, 80)
         sbfParser.addData(data)
+        val block = sbfParser.getBlocks().first()
+        val blockBody = block.body as BaseVectorGeod
+        println(block)
+        require(abs(blockBody.vectorInfoGeod.first().deltaNorth) > 1 )
     }
 }
