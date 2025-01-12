@@ -40,13 +40,10 @@ fun <T : BlockBody> decode(bytes: ByteBuffer, clazz: Class<T>): T {
                 if (bytes.remaining() < subBlockLength) {
                     throw IncompleteBlockException("Not enough bytes to decode sub-block", bytes.array())
                 }
-                val subBlockBytes = ByteArray(subBlockLength)
-                bytes.get(subBlockBytes)
-                val subBuffer = ByteBuffer.wrap(subBlockBytes)
 
                 @Suppress("UNCHECKED_CAST")
                 val subBlockDecoded = decodeSubBlock(
-                    subBuffer,
+                    bytes,
                     subBlockKClass.java as Class<SubBlock>
                 )
                 resultList.add(subBlockDecoded)
