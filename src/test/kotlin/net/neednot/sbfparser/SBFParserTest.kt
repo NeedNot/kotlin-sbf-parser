@@ -45,4 +45,11 @@ class SBFParserTest {
         println(blocks)
         require(blocks.size == 1)
     }
+
+    @Test
+    fun badBaseVectorGeod() {
+        val sbfParser = SBFParser()
+        val data = byteArrayOf(36, 64, -79, 55, -68, 15, 16, 0, -1, -1, -1, -1, -1, -1, 0, 52)
+        sbfParser.addData(data)
+    }
 }

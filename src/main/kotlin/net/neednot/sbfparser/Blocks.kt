@@ -10,6 +10,8 @@ sealed interface BlockBody {
     val name: String
 }
 
+sealed interface SubBlock
+
 /** Block id 4082 */
 @OptIn(ExperimentalUnsignedTypes::class)
 data class QualityInd(
@@ -27,7 +29,7 @@ data class QualityInd(
      *
      * 12-15: Reserved
      * */
-    @ArrayLength("n")
+    @ArraySize("n")
     val indicators: UShortArray
 ): BlockBody
 
@@ -51,20 +53,25 @@ data class BaseVectorGeod(
     val n: UByte,
     val sbLength: UByte,
 
-//    sub block
-    val nrSV: UByte,
-    val error: UByte,
-    val mode: UByte,
-    val misc: UByte,
-    val deltaEast: Double,
-    val deltaNorth: Double,
-    val deltaUp: Double,
-    val deltaVe: Float,
-    val deltaVn: Float,
-    val deltaVu: Float,
-    val azimuth: UShort,
-    val elevation: Short,
-    val referenceId: UShort,
-    val corrAge: UShort,
-    val signalInfo: UInt
-): BlockBody
+//    @(sizeFieldName = "n", lengthFieldName = "sbLength")
+    val vectorInfoGeod: List<VectorInfoGeod>
+
+): BlockBody {
+    data class VectorInfoGeod(
+        val nrSV: UByte,
+        val error: UByte,
+        val mode: UByte,
+        val misc: UByte,
+        val deltaEast: Double,
+        val deltaNorth: Double,
+        val deltaUp: Double,
+        val deltaVe: Float,
+        val deltaVn: Float,
+        val deltaVu: Float,
+        val azimuth: UShort,
+        val elevation: Short,
+        val referenceId: UShort,
+        val corrAge: UShort,
+        val signalInfo: UInt
+    ): SubBlock
+}
