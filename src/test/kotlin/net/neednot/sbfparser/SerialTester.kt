@@ -55,7 +55,8 @@ fun readSerialData(portName: String) {
                         val body = block.body
                         when (body) {
                             is BaseVectorGeod -> {
-                                println("East ${body.deltaEast}, North ${body.deltaNorth}, Up ${body.deltaUp}")
+                                val vectorInfoGeod = body.vectorInfoGeod.firstOrNull()
+                                println("East ${vectorInfoGeod?.deltaEast}, North ${vectorInfoGeod?.deltaNorth}, Up ${vectorInfoGeod?.deltaUp}")
                             }
                             is QualityInd -> {
                                 println("Quality $body")
