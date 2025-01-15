@@ -30,3 +30,22 @@ To add a new block:
   ```kotlin
   100 to MyBlock::class.java
   ```
+
+## Installation
+Add it in your root build.gradle at the end of repositories
+```
+	dependencyResolutionManagement {
+		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+		repositories {
+			mavenCentral()
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+Add the dependency
+```
+dependencies {
+  implementation 'com.github.NeedNot:kotlin-sbf-parser:Tag'
+}
+```
