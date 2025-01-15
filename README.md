@@ -24,6 +24,8 @@ To add a new block:
 - Create a new data class that extends `BlockBody`.
 - Implement the `name` field with the name of the block.
 - Create fields for every block field.
+- Strings and arrays should use the `@ArraySize` annotation
+- Sub-blocks should use the `@SubBlockList` annotation
 - Add the block ID to the `blockClassById` map like this:
   ```kotlin
   100 to MyBlock::class.java
