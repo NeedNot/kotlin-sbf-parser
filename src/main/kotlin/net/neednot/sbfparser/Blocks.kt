@@ -53,7 +53,7 @@ data class BaseVectorGeod(
     val n: UByte,
     val sbLength: UByte,
 
-    @SubBlockList(sizeFieldName = "n", lengthFieldName = "sbLength")
+    @SubBlockListSize(sizeFieldName = "n", lengthFieldName = "sbLength")
     val vectorInfoGeod: List<VectorInfoGeod>
 
 ): BlockBody {

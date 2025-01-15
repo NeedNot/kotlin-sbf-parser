@@ -13,19 +13,19 @@ fun <T : BlockBody> decode(bytes: ByteBuffer, clazz: Class<T>): T {
 
     constructor.parameters.filter { it.name != "name" }.forEach { param ->
 
-        val subBlockListAnnotation = clazz.kotlin.members
+        val subBlockListSizeAnnotation = clazz.kotlin.members
             .find { it.name == param.name }
             ?.annotations
-            ?.filterIsInstance<SubBlockList>()
+            ?.filterIsInstance<SubBlockListSize>()
             ?.firstOrNull()
 
-        if (subBlockListAnnotation != null) {
+        if (subBlockListSizeAnnotation != null) {
 
-            val sizeValue = params.entries.firstOrNull { it.key.name == subBlockListAnnotation.sizeFieldName }?.value
-                ?: throw IllegalArgumentException("Could not find property '${subBlockListAnnotation.sizeFieldName}' for sub-block list size.")
+            val sizeValue = params.entries.firstOrNull { it.key.name == subBlockListSizeAnnotation.sizeFieldName }?.value
+                ?: throw IllegalArgumentException("Could not find property '${subBlockListSizeAnnotation.sizeFieldName}' for sub-block list size.")
             val lengthValue =
-                params.entries.firstOrNull { it.key.name == subBlockListAnnotation.lengthFieldName }?.value
-                    ?: throw IllegalArgumentException("Could not find property '${subBlockListAnnotation.lengthFieldName}' for sub-block list length.")
+                params.entries.firstOrNull { it.key.name == subBlockListSizeAnnotation.lengthFieldName }?.value
+                    ?: throw IllegalArgumentException("Could not find property '${subBlockListSizeAnnotation.lengthFieldName}' for sub-block list length.")
 
             val subBlockCount = decodeNumber(sizeValue)
             val subBlockLength = decodeNumber(lengthValue)
@@ -200,4 +200,4 @@ annotation class ArraySize(val sizeFieldName: String = "", val size: Int = -1)
  */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class SubBlockList(val sizeFieldName: String, val lengthFieldName: String)
+annotation class SubBlockListSize(val sizeFieldName: String, val lengthFieldName: String)
